@@ -148,11 +148,13 @@ window.addEventListener('load', () => {
     });
 
     canvas.addEventListener('mousedown', startDrawing);
-    window.addEventListener('mousemove', draw);
-    window.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
     canvas.addEventListener('touchstart', (e) => { startDrawing(e); e.preventDefault(); }, {passive: false});
-    window.addEventListener('touchmove', (e) => { draw(e); }, {passive: false});
-    window.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchmove', (e) => { draw(e); }, {passive: false});
+    canvas.addEventListener('touchend', stopDrawing);
 
     updateCanvasBackground();
 });

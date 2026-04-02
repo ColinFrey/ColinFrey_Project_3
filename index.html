@@ -3,14 +3,119 @@
 <head>
   <meta charset="utf-8">
   <title>Sea Sketch!</title>
-   <meta name="description" content="This site is a digital canvas for drawing with an aquatic background and theme.">
+  <meta name="description" content="This site is a digital canvas for drawing with an aquatic background and theme.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="img/Brush.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/main.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        display: flex; flex-direction: column; min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+        background-color: #0b1521; overflow: hidden;
+    }
+
+    /* ACCESSIBILITY UTILITY */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+    }
+
+    /* HEADER */
+    h1 {
+        font-family: "Shrikhand", serif; font-weight: 400; color: #ffffff;
+        font-size: 5rem; text-align: center; text-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        letter-spacing: 2px; position: absolute; top: -10px; left: 50%;
+        transform: translateX(-50%); width: 100%; z-index: 10;
+    }
+    .main-header { width: 100%; height: 120px; z-index: 10; }
+
+    /* LAYOUT */
+    .main-layout {
+        flex: 1; display: flex; justify-content: center; align-items: flex-start;
+        padding-top: 10px; z-index: 10;
+    }
+    .canvas-container { position: relative; display: inline-block; }
+    .card {
+        display: block; width: 900px; height: 600px; background-color: #ffffff;
+        border-radius: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); cursor: crosshair;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        position: absolute; left: calc(100% + 30px); top: 0; height: 600px;
+        display: flex; flex-direction: column; justify-content: space-between;
+        background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px);
+        padding: 25px 10px; border-radius: 50px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); align-items: center; width: 90px; z-index: 100;
+    }
+    .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+    label { font-size: 14px; color: #111; font-weight: 900; letter-spacing: 0.5px; cursor: pointer; }
+
+    /* PARALLAX Background */
+    .parallax-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+    .layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: repeat-x; background-size: auto 100%; }
+    .layer-far { background-image: url('../img/far copy.png'); animation: moveBack 300s linear infinite; opacity: 0.6; }
+    .layer-sand { background-image: url('../img/sand copy.png'); animation: moveBack 200s linear infinite; }
+    .layer-fore-1 { background-image: url('../img/foreground-1 copy.png'); animation: moveBack 120s linear infinite; }
+    .layer-fore-2 { background-image: url('../img/foreground-2 copy.png'); animation: moveBack 80s linear infinite; }
+    @keyframes moveBack { from { background-position: 0 0; } to { background-position: -3000px 0; } }
+
+    /* BUTTONS & INPUTS */
+    .history-oval {
+        display: flex; flex-direction: column; width: 44px; height: 80px;
+        background: #fff; border: 2px solid #ddd; border-radius: 25px; overflow: hidden;
+    }
+    .oval-half {
+        flex: 1; border: none; background: transparent; cursor: pointer;
+        display: flex; justify-content: center; align-items: center; padding: 6px;
+    }
+    .oval-half:first-child { border-bottom: 1px solid #eee; }
+    .oval-half:hover { background: #f0f8ff; }
+    .oval-half img { width: 100%; height: 100%; object-fit: contain; }
+
+    .size-controls-container { display: flex; flex-direction: row; align-items: center; gap: 8px; }
+    .step-stack { display: flex; flex-direction: column; gap: 4px; }
+    .step-btn-mini {
+        background: #eee; border: 1px solid #ccc; border-radius: 4px;
+        width: 22px; height: 22px; cursor: pointer; font-weight: bold;
+        font-size: 14px; display: flex; align-items: center; justify-content: center;
+    }
+
+    input[type="range"] {
+        writing-mode: vertical-lr; direction: rtl; appearance: auto;
+        width: 12px; height: 100px; cursor: pointer;
+    }
+
+    .icon-btn { width: 44px; height: 44px; padding: 10px; border-radius: 50%; border: 2px solid transparent; background: #fdfdfd; cursor: pointer; }
+    .icon-btn.active { background: #eef2f3; border-color: #7d8bb2; }
+    .icon-btn img, .icon-btn svg { width: 100%; height: 100%; }
+
+    .rect-picker { width: 45px; height: 30px; border-radius: 4px; border: 2px solid #ccc; cursor: pointer; }
+    .rect-picker.sm { width: 30px; }
+
+    .clear-x-btn { width: 48px; height: 48px; border-radius: 50%; border: none; background: #c0392b; color: white; font-size: 22px; font-weight: 900; cursor: pointer; }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(11, 21, 33, 0.85); display: none;
+        justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px);
+    }
+    .modal-content {
+        background: white; padding: 40px; border-radius: 30px;
+        text-align: center; max-width: 400px; width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 25px; }
+    .modal-btn { padding: 12px 25px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; }
+    .modal-btn.primary { background: #c0392b; color: white; }
+    .modal-btn.secondary { background: #ddd; color: #333; }
+  </style>
 </head>
 <body>
   <div class="parallax-wrapper">
@@ -27,15 +132,18 @@
   <main class="main-layout">
     <div class="canvas-container">
       <canvas id="drawingCanvas" class="card" width="900" height="600"></canvas>
+      
       <aside class="toolbar" id="mainToolbar">
         <div class="control-group">
-          <button id="drawBtn" class="icon-btn active" title="Brush"><img src="img/Brush.png" alt="Brush"></button>
-          <button id="eraserBtn" class="icon-btn" title="Eraser"><img src="img/Eraser.png" alt="Eraser"></button>
+          <button id="drawBtn" class="icon-btn active" title="Brush" aria-label="Brush Tool"><img src="img/Brush.png" alt="Brush"></button>
+          <button id="eraserBtn" class="icon-btn" title="Eraser" aria-label="Eraser Tool"><img src="img/Eraser.png" alt="Eraser"></button>
+          
           <div class="history-oval">
-            <button id="undoBtn" class="oval-half" title="Undo"><img src="img/Undo.png" alt="Undo"></button>
-            <button id="redoBtn" class="oval-half" title="Redo"><img src="img/Redo.png" alt="Redo"></button>
+            <button id="undoBtn" class="oval-half" title="Undo" aria-label="Undo"><img src="img/Undo.png" alt="Undo"></button>
+            <button id="redoBtn" class="oval-half" title="Redo" aria-label="Redo"><img src="img/Redo.png" alt="Redo"></button>
           </div>
-          <button id="downloadBtn" class="icon-btn" title="Download">
+
+          <button id="downloadBtn" class="icon-btn" title="Download" aria-label="Download Drawing">
             <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -43,27 +151,33 @@
             </svg>
           </button>
         </div>
+
         <div class="control-group">
           <label for="colorPicker">PEN</label>
           <input type="color" id="colorPicker" class="rect-picker" value="#000000">
         </div>
+
         <div class="control-group">
-          <label>FILL</label>
+          <label for="bgEnabled">FILL</label>
           <div class="bg-toggle-container" style="display: flex; gap: 4px; align-items: center;">
-            <input type="checkbox" id="bgEnabled"><input type="color" id="bgColorPicker" class="rect-picker sm" value="#ffffff">
+            <input type="checkbox" id="bgEnabled">
+            <label for="bgColorPicker" class="sr-only">Background Color</label>
+            <input type="color" id="bgColorPicker" class="rect-picker sm" value="#ffffff">
           </div>
         </div>
+
         <div class="control-group">
-          <label>SIZE</label>
+          <label for="lineWidth">SIZE</label>
           <div class="size-controls-container">
             <input type="range" id="lineWidth" min="1" max="80" value="5">
             <div class="step-stack">
-              <button id="increaseSize" class="step-btn-mini">+</button>
-              <button id="decreaseSize" class="step-btn-mini">−</button>
+              <button id="increaseSize" class="step-btn-mini" aria-label="Increase brush size">+</button>
+              <button id="decreaseSize" class="step-btn-mini" aria-label="Decrease brush size">−</button>
             </div>
           </div>
         </div>
-        <button id="clearBtn" class="clear-x-btn">✕</button>
+
+        <button id="clearBtn" class="clear-x-btn" aria-label="Clear Canvas">✕</button>
       </aside>
     </div>
   </main>
@@ -78,6 +192,7 @@
       </div>
     </div>
   </div>
+
   <script src="js/main.js"></script>
 </body>
 </html>
