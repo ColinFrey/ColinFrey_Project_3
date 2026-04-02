@@ -3,19 +3,22 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Responsive Layouts</title>
-  <meta name="description" content="This site will serve as the hub for many sub responsive layouts">
+  <title>Sea Sketch!</title>
+  <meta name="description" content="This site is a digital canvas for drawing with an aquatic background and theme.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta property="og:title" content="">
-  <meta property="og:type" content="">
+  <meta property="og:title" content="Sea Sketch">
+  <meta property="og:type" content="website">
   <meta property="og:url" content="">
   <meta property="og:image" content="">
 
   <link rel="manifest" href="site.webmanifest">
-  <link rel="icon" href="icon.png">
-  <!-- Place favicon.ico in the root directory -->
+  <link rel="icon" type="image/png" href="img/Brush.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/main.css">
 
@@ -23,8 +26,89 @@
 </head>
 
 <body>
-  <!-- Place your site's HTML here -->
-  <p>This text will display on your site! Jan 19</p>
+  <div class="parallax-wrapper">
+    <div class="layer layer-far"></div>
+    <div class="layer layer-sand"></div>
+    <div class="layer layer-fore-1"></div>
+    <div class="layer layer-fore-2"></div>
+    <div class="layer-tint"></div>
+  </div>
+
+  <header class="main-header">
+    <h1 class="shrikhand-regular">Sea Sketch</h1>
+  </header>
+
+  <main class="main-layout">
+    <div class="canvas-container">
+      <canvas id="drawingCanvas" class="card" width="900" height="600"></canvas>
+
+      <aside class="toolbar" id="mainToolbar">
+        <div class="control-group">
+          <button id="drawBtn" class="icon-btn active" title="Brush">
+            <img src="img/Brush.png" alt="Brush">
+          </button>
+          <button id="eraserBtn" class="icon-btn" title="Eraser">
+            <img src="img/Eraser.png" alt="Eraser">
+          </button>
+
+          <div class="history-oval">
+            <button id="undoBtn" class="oval-half" title="Undo">
+              <img src="img/Undo.png" alt="Undo">
+            </button>
+            <button id="redoBtn" class="oval-half" title="Redo">
+              <img src="img/Redo.png" alt="Redo">
+            </button>
+          </div>
+
+          <button id="downloadBtn" class="icon-btn" title="Download Image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label for="colorPicker">PEN</label>
+          <input type="color" id="colorPicker" class="rect-picker" value="#000000">
+        </div>
+
+        <div class="control-group bg-control">
+          <label>FILL</label>
+          <div class="bg-toggle-container">
+            <input type="checkbox" id="bgEnabled" title="Enable Background Color">
+            <input type="color" id="bgColorPicker" class="rect-picker sm" value="#ffffff">
+          </div>
+        </div>
+
+        <div class="control-group slider-group">
+          <label>SIZE</label>
+          <div class="size-controls-container">
+            <input type="range" id="lineWidth" min="1" max="80" value="5">
+            <div class="step-stack">
+              <button id="increaseSize" class="step-btn-mini" aria-label="Increase size">+</button>
+              <button id="decreaseSize" class="step-btn-mini" aria-label="Decrease size">−</button>
+            </div>
+          </div>
+        </div>
+
+        <button id="clearBtn" class="clear-x-btn" title="Clear Canvas">✕</button>
+      </aside>
+    </div>
+  </main>
+
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 class="shrikhand-regular">Clear Canvas?</h2>
+      <p>Are you sure you want to clear your artwork? This cannot be undone.</p>
+      <div class="modal-buttons">
+        <button id="cancelClear" class="modal-btn secondary">Go Back</button>
+        <button id="confirmClear" class="modal-btn primary">Yes, Clear It</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
 </body>
 
