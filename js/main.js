@@ -1,4 +1,3 @@
-// JS scripts placed here
 window.addEventListener('load', () => {
     const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
@@ -14,7 +13,6 @@ window.addEventListener('load', () => {
     const downloadBtn = document.getElementById('downloadBtn');
     const increaseBtn = document.getElementById('increaseSize');
     const decreaseBtn = document.getElementById('decreaseSize');
-
     const confirmModal = document.getElementById('confirmModal');
     const confirmClearBtn = document.getElementById('confirmClear');
     const cancelClearBtn = document.getElementById('cancelClear');
@@ -55,12 +53,11 @@ window.addEventListener('load', () => {
         };
     }
 
-    // Stacked Button Precision
     increaseBtn.addEventListener('click', () => {
-        lineWidth.value = Math.min(parseInt(lineWidth.value) + 1, 80);
+        lineWidth.value = Math.min(parseInt(lineWidth.value) + 2, 80);
     });
     decreaseBtn.addEventListener('click', () => {
-        lineWidth.value = Math.max(parseInt(lineWidth.value) - 1, 1);
+        lineWidth.value = Math.max(parseInt(lineWidth.value) - 2, 1);
     });
 
     function getMousePos(e) {
